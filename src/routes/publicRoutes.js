@@ -1,30 +1,27 @@
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const fs = require('fs')
+const jsonServer = require("json-server");
+const server = jsonServer.create();
+const fs = require("fs");
 
-const { emailExiste, usuarioExiste } = require('../services/userService')
-const { createToken } = require('../services/authService')
-let { userDB } = require('../config/database')
+const { emailExiste, usuarioExiste } = require("../services/userService");
+const { createToken } = require("../services/authService");
+let { userDB } = require("../config/database");
 
-server.post('/registrar', async (req, res) => {
+server.post("/cadastrar", async (req, res) => {
     const { email, senha, nome, endereco, complemento, cep } = req.body;
 
     if (emailExiste(email)) {
         const status = 401;
-        const message = 'E-mail já foi utilizado!';
+        const message = "E-mail já foi utilizado!";
         return res.status(status).json({ status, message });
-
     }
 
     fs.readFile("./src/data/usuarios.json", (err, data) => {
         if (err) {
-            const status = 401
-            console.log(err)
-            const message = err
-            return res.status(status).json({ status, message })
-
-        };
-
+            const status = 401;
+            console.log(err);
+            const message = err;
+            return res.status(status).json({ status, message });
+        }
 
         const json = JSON.parse(data.toString());
 
@@ -34,34 +31,33 @@ server.post('/registrar', async (req, res) => {
 
         fs.writeFile("./src/data/usuarios.json", JSON.stringify(json), (err) => {
             if (err) {
-                const status = 401
-                const message = err
-                return res.status(status).json({ status, message })
-
+                const status = 401;
+                const message = err;
+                return res.status(status).json({ status, message });
             }
         });
-        userDB = json
+        userDB = json;
     });
 
-    const access_token = createToken({ email, senha })
-    return res.status(200).json({ access_token })
-})
+    const access_token = createToken({ email, senha });
+    return res.status(200).json({ access_token });
+});
 
-server.post('/login', (req, res) => {
+server.post("/login", (req, res) => {
     const { email, senha } = req.body;
     if (!usuarioExiste(email, senha)) {
-        const status = 401
-        const message = 'E-mail ou senha incorretos!'
-        res.status(status).json({ status, message })
-        return
+        const status = 401;
+        const message = "E-mail ou senha incorretos!";
+        res.status(status).json({ status, message });
+        return;
     }
-    const access_token = createToken({ email, senha })
-    let user = { ...userDB.usuarios.find(user => user.email === email && user.senha === senha) }
-    delete user.senha
-    res.status(200).json({ access_token, user })
-})
+    const access_token = createToken({ email, senha });
+    let user = { ...userDB.usuarios.find((user) => user.email === email && user.senha === senha) };
+    delete user.senha;
+    res.status(200).json({ access_token, user });
+});
 
-server.get('/lancamentos', (req, res) => {
+server.get("/lancamentos", (req, res) => {
     res.status(200).json([
         {
             "id": 4,
@@ -72,36 +68,30 @@ server.get('/lancamentos', (req, res) => {
             "isbn": "978-85-94188-60-1",
             "numeroPaginas": 172,
             "publicacao": "2018-05-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/bootstrap4.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/bootstrap4.png",
             "autor": 4,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "Fazer um site elegante nunca foi tão fácil, mesmo para quem não sabe escrever uma linha de CSS e, muito menos, entende como harmonizar cores, balancear elementos e tipografia. O Bootstrap é, resumidamente, um grande arquivo CSS com uma excelente documentação, que possui dezenas e dezenas de componentes prontos. No começo, foi criado pelo Twitter para servir como um guia de estilos em CSS da empresa; hoje, é a biblioteca mais famosa e utilizada no mundo."
+            "sobre":
+                "Fazer um site elegante nunca foi tão fácil, mesmo para quem não sabe escrever uma linha de CSS e, muito menos, entende como harmonizar cores, balancear elementos e tipografia. O Bootstrap é, resumidamente, um grande arquivo CSS com uma excelente documentação, que possui dezenas e dezenas de componentes prontos. No começo, foi criado pelo Twitter para servir como um guia de estilos em CSS da empresa; hoje, é a biblioteca mais famosa e utilizada no mundo.",
         },
         {
             "id": 5,
@@ -112,36 +102,30 @@ server.get('/lancamentos', (req, res) => {
             "isbn": "978-85-94188-00-7",
             "numeroPaginas": 502,
             "publicacao": "2017-08-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/cangaceirojavascript.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/cangaceirojavascript.png",
             "autor": 5,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "Talvez nenhuma outra linguagem tenha conseguido invadir o coletivo imaginário dos desenvolvedores como JavaScript fez. Em sua história fabular em busca de identidade, foi a única que conseguiu se enraizar nos navegadores, tornando-se uma linguagem em que todo desenvolvedor precisa ter algum nível de conhecimento."
+            "sobre":
+                "Talvez nenhuma outra linguagem tenha conseguido invadir o coletivo imaginário dos desenvolvedores como JavaScript fez. Em sua história fabular em busca de identidade, foi a única que conseguiu se enraizar nos navegadores, tornando-se uma linguagem em que todo desenvolvedor precisa ter algum nível de conhecimento.",
         },
         {
             "id": 6,
@@ -152,41 +136,35 @@ server.get('/lancamentos', (req, res) => {
             "isbn": "978-85-5519-076-6",
             "numeroPaginas": 144,
             "publicacao": "2015-06-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/css.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/css.png",
             "autor": 6,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "Quando aprendemos a trabalhar com CSS, frequentemente nos pegamos perdidos em detalhes fundamentais que não nos são explicados. Por vezes, alguns desses detalhes passam despercebidos até pelo desenvolvedor front-end mais experiente. Mas como ir além do conhecimento básico do CSS e preparar o caminho para explorar tópicos mais avançados?"
+            "sobre":
+                "Quando aprendemos a trabalhar com CSS, frequentemente nos pegamos perdidos em detalhes fundamentais que não nos são explicados. Por vezes, alguns desses detalhes passam despercebidos até pelo desenvolvedor front-end mais experiente. Mas como ir além do conhecimento básico do CSS e preparar o caminho para explorar tópicos mais avançados?",
         },
-    ])
-})
+    ]);
+});
 
-server.get('/mais-vendidos', (req, res) => {
+server.get("/mais-vendidos", (req, res) => {
     res.status(200).json([
         {
             "id": 1,
@@ -197,36 +175,30 @@ server.get('/mais-vendidos', (req, res) => {
             "isbn": "978-65-86110-10-4",
             "numeroPaginas": 246,
             "publicacao": "2020-04-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/acessibilidade.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/acessibilidade.png",
             "autor": 1,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "Acessibilidade na Web consiste na eliminação de barreiras de acesso em páginas e aplicações digitais para que pessoas com deficiência tenham autonomia na rede. Na verdade, acessibilidade na web beneficia todas as pessoas. Em algum momento da vida todos podem precisar de acessibilidade, seja devido a uma limitação temporária ou permanente. Quando não levamos em consideração o acesso de pessoas com deficiência, estamos tirando o direito de uma pessoa de navegar, interagir ou consumir produtos e serviços na rede. Empatia é o fator principal para que as aplicações que desenvolvemos sejam inclusivas."
+            "sobre":
+                "Acessibilidade na Web consiste na eliminação de barreiras de acesso em páginas e aplicações digitais para que pessoas com deficiência tenham autonomia na rede. Na verdade, acessibilidade na web beneficia todas as pessoas. Em algum momento da vida todos podem precisar de acessibilidade, seja devido a uma limitação temporária ou permanente. Quando não levamos em consideração o acesso de pessoas com deficiência, estamos tirando o direito de uma pessoa de navegar, interagir ou consumir produtos e serviços na rede. Empatia é o fator principal para que as aplicações que desenvolvemos sejam inclusivas.",
         },
         {
             "id": 2,
@@ -237,36 +209,30 @@ server.get('/mais-vendidos', (req, res) => {
             "isbn": "978-85-7254-036-0",
             "numeroPaginas": 163,
             "publicacao": "2019-11-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/angular.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/angular.png",
             "autor": 2,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "No desenvolvimento de aplicações web e mobile, há disponível uma quantidade expressiva de linguagens, frameworks e ferramentas. Nessa imensidão, é comum se questionar ou até ter inseguranças sobre qual o melhor caminho para a construção neste segmento. O Angular é uma plataforma que facilita a construção de aplicativos, combinando templates, injeção de dependências, tudo integrado às melhores práticas de desenvolvimento."
+            "sobre":
+                "No desenvolvimento de aplicações web e mobile, há disponível uma quantidade expressiva de linguagens, frameworks e ferramentas. Nessa imensidão, é comum se questionar ou até ter inseguranças sobre qual o melhor caminho para a construção neste segmento. O Angular é uma plataforma que facilita a construção de aplicativos, combinando templates, injeção de dependências, tudo integrado às melhores práticas de desenvolvimento.",
         },
         {
             "id": 3,
@@ -277,38 +243,32 @@ server.get('/mais-vendidos', (req, res) => {
             "isbn": "978-65-86110-86-9",
             "numeroPaginas": 138,
             "publicacao": "2021-10-01",
-            "imagemCapa": "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/arquitetura.png",
+            "imagemCapa":
+                "https://raw.githubusercontent.com/viniciosneves/alurabooks/curso-novo/public/imagens/livros/arquitetura.png",
             "autor": 3,
             "opcoesCompra": [
                 {
                     "id": 1,
                     "titulo": "E-book",
                     "preco": 29.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
+                    "formatos": [".pdf", ".pub", ".mob"],
                 },
                 {
                     "id": 2,
                     "titulo": "Impresso",
-                    "preco": 39.9
+                    "preco": 39.9,
                 },
                 {
                     "id": 3,
                     "titulo": "E-book + Impresso",
                     "preco": 59.9,
-                    "formatos": [
-                        ".pdf",
-                        ".pub",
-                        ".mob"
-                    ]
-                }
+                    "formatos": [".pdf", ".pub", ".mob"],
+                },
             ],
-            "sobre": "Com constantes evoluções, adições de novas funcionalidades e integrações com outros sistemas, os softwares têm se tornado cada vez mais complexos, mais difíceis de serem entendidos. Dessa forma, fazer com que os custos de manutenção desses softwares não ultrapassem o valor que eles entregam às companhias é um desafio para a arquiteta ou arquiteto de software."
-        }
-    ])
-})
+            "sobre":
+                "Com constantes evoluções, adições de novas funcionalidades e integrações com outros sistemas, os softwares têm se tornado cada vez mais complexos, mais difíceis de serem entendidos. Dessa forma, fazer com que os custos de manutenção desses softwares não ultrapassem o valor que eles entregam às companhias é um desafio para a arquiteta ou arquiteto de software.",
+        },
+    ]);
+});
 
-module.exports = server
+module.exports = server;
